@@ -1,0 +1,102 @@
+.input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* กำหนดความสูงของ input container */
+}
+
+input {
+  width: 80%;
+  height: 80%;
+  padding: 50px;
+  font-size: 50px;
+  border: none;
+  box-sizing: border-box;
+}
+
+.small-input {
+  width: 50%;
+  padding: 20px;
+  font-size: 50px;
+  border: none;
+  box-sizing: border-box;
+  margin-left: 80px; /* Add margin to the left */
+}
+
+
+header {
+  text-align: center;
+}
+
+.symptom-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.symptom-list li {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.button-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.button-gap {
+  margin-right: 10px;
+}
+
+.selected {
+  background-color: lightblue; /* เปลี่ยนสีเมื่อถูกเลือก */
+}
+
+.center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.input-container {
+  margin-bottom: 10px;
+  padding-top: 80px; /* หรือเลือกใช้ padding-top */
+}
+
+p1 {
+  font-size: 50px; /* Adjust the font size for <p1> */
+}
+
+p2 {
+  font-size: 50px; /* Adjust the font size for <p2> */
+}
+
+p3 {
+  font-size: 50px; /* Adjust the font size for <p3> */
+}
+
+p4 {
+  font-size: 50px; /* Adjust the font size for <p4> */
+}
+
+p5 {
+  font-size: 50px; /* Adjust the font size for <p5> */
+}
+
+p6 {
+  font-size: 50px; /* Adjust the font size for <p6> */
+}
+
+p7 {
+  font-size: 50px; /* Adjust the font size for <p7> */
+}
+
+p8 {
+  font-size: 50px; /* Adjust the font size for <p8> */
+}
+
