@@ -87,19 +87,26 @@ def delete_question():
     except Exception as e:
         return jsonify({"status": "error", "message": "Internal Server Error", "error": str(e)}), 500
 
+
 @app.route('/answer', methods=['POST'])
-def receive_answer():
+def receive_data():
     try:
-        data = request.json
-        if not data or len(data) != 1:
-            return jsonify({"error": "Invalid data format"}), 400
-        key = next(iter(data))
-        if key not in ["answer"]:
-            return jsonify({"error": "Invalid key"}), 400
-        data["answer"][key] = data[key]
-        return jsonify({"message": "Answer received successfully"}), 200
+        data = request.get_json()  # Assume the data is in JSON format
+        AnswerNo = data.get('AnswerNo')
+        Message = data.get('Message')
+        print(f'AnswerNo: {AnswerNo}')
+        print(f'Message: {Message}')
+        existing_question = db.answer.find_one({"AnswerNo": AnswerNo})
+        if existing_question:
+            db.answer.update_one({"AnswerNo": AnswerNo}, {"$set": {"Message": Message}})
+            return jsonify({"status": "ok", "message": f"Answer with AnswerNo {AnswerNo} is updated"}), 200
+        else:
+            new_question = {"AnswerNo": AnswerNo, "Message": Message}
+            db.answer.insert_one(new_question)
+            return jsonify({"status": "ok", "message": f"Answer with AnswerNo {AnswerNo} is posted"}), 200
     except Exception as e:
-        return jsonify({"status": "error", "message": "Internal Server Error", "error": str(e)}), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
+  
 
 if __name__ == '__main__':
     app.run(port=5001)

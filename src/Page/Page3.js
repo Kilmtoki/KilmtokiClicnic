@@ -32,11 +32,25 @@ function Page3() {
                 audioChunks.current.push(e.data);
             };
 
-            recorder.onstop = () => {
+            recorder.onstop = async () => {
                 const combinedBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
                 downloadWav(combinedBlob, false);
                 audioChunks.current = []; // Clear audioChunks after downloading
+            
+                // Set timeout for 5 seconds before executing the try block
+                setTimeout(async () => {
+                    try {
+                        const key = 'ans1';
+                        const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
+                        const data = response.data;
+                        console.log(data);
+                        setTextTranscription(data);
+                    } catch (error) {
+                        console.error('Error fetching audio:', error);
+                    }
+                }, 5000); // 5000 milliseconds = 5 seconds
             };
+            
 
             setMediaRecorder(recorder);
             recorder.start();
@@ -51,15 +65,6 @@ function Page3() {
         if (mediaRecorder) {
             mediaRecorder.stop();
             mediaStream.current.getTracks().forEach(track => track.stop());
-        }
-        try {
-            const key = 'ans1';
-            const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
-            const data = response.data;
-            console.log(data);
-            setTextTranscription(data);
-        } catch (error) {
-            console.error('Error fetching audio:', error);
         }
     };
 

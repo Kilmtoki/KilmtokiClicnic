@@ -7,7 +7,7 @@ import './Page.css';
 import { downloadWav } from 'webm-to-wav-converter';
 import axios from 'axios';
 
-function Page7() {
+function Page3() {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const mediaStream = useRef(null);
@@ -32,25 +32,11 @@ function Page7() {
                 audioChunks.current.push(e.data);
             };
 
-            recorder.onstop = async () => {
+            recorder.onstop = () => {
                 const combinedBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
                 downloadWav(combinedBlob, false);
                 audioChunks.current = []; // Clear audioChunks after downloading
-            
-                // Set timeout for 5 seconds before executing the try block
-                setTimeout(async () => {
-                    try {
-                        const key = 'ans5';
-                        const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
-                        const data = response.data;
-                        console.log(data);
-                        setTextTranscription(data);
-                    } catch (error) {
-                        console.error('Error fetching audio:', error);
-                    }
-                }, 5000); // 5000 milliseconds = 5 seconds
             };
-            
 
             setMediaRecorder(recorder);
             recorder.start();
@@ -65,6 +51,15 @@ function Page7() {
         if (mediaRecorder) {
             mediaRecorder.stop();
             mediaStream.current.getTracks().forEach(track => track.stop());
+        }
+        try {
+            const key = 'ans1';
+            const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
+            const data = response.data;
+            console.log(data);
+            setTextTranscription(data);
+        } catch (error) {
+            console.error('Error fetching audio:', error);
         }
     };
 
@@ -89,7 +84,7 @@ function Page7() {
     const handleFetchAudio = async () => {
         try {
             const response = await axios.get('http://127.0.0.1:5000/data');
-            const audioData = response.data.question[5].audio;
+            const audioData = response.data.question[1].audio;
             console.log(audioData);
             // Create a Blob object from the base64 string
             const blob = base64ToBlob(audioData, 'audio/wav');
@@ -107,12 +102,14 @@ function Page7() {
 
     return (
         <div>
-            <header>
-                     มีกิจกรรมการออกกำลังกายอยู่ไหมคะ?
+            <div> 
+                <header>
+                    ไม่ทราบว่าเป็นอะไรมา มีอาการอะไรบ้างคะ?
                     <span className="button-gap"></span>
                     <span className="button-gap"></span>
                     <button onClick={handleFetchAudio}><AiFillSound  /></button>
-            </header>
+                </header>
+            </div>
             <div className="input-container">
                 <input
                     type="text"
@@ -131,12 +128,12 @@ function Page7() {
                 </div>
                 <span className="button-gap"></span>
                 <span className="button-gap"></span>
-                <Link to="/choosepage7">
+                <Link to="/choosepage3">
                     <button>เลือกคำตอบ</button>
                 </Link>
                 <span className="button-gap"></span>
                 <span className="button-gap"></span>
-                <Link to="/page8">
+                <Link to="/page4">
                     <button>ถัดไป</button>
                 </Link>
                 <span className="button-gap"></span>
@@ -145,7 +142,4 @@ function Page7() {
     );
 }
 
-export default Page7;
-
-
-
+export default Page3;

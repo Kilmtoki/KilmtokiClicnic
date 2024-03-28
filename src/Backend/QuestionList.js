@@ -80,7 +80,7 @@ const QuestionList = () => {
 
   return (
     <div>
-      <header style={{ textAlign: 'center', marginBottom: '20px' }}>Questions List</header>
+      <header style={{ textAlign: 'center', marginBottom: '5px' }}>Questions List</header>
       <div style={{ textAlign: 'center' }}>
         <ul>
           {questions.map(question => (

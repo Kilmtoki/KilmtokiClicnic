@@ -5,7 +5,8 @@ import numpy as np
 from Model_speech_to_text import pipe
 import librosa
 import os
-
+from pathlib import Path
+import requests
 app = Flask(__name__)
 CORS(app)
 
@@ -92,11 +93,19 @@ def receive_answer():
         key = list(req_data.keys())[0]
         if key in data["answer"]:
             data["answer"][key] = req_data[key]
-            return jsonify({ "message": "Answer received successfully" })
+            payload = {'AnswerNo': key, 'Message': req_data[key]}
+            print(payload)
+            try:
+                # Send POST request to the other server
+                response = requests.post("http://127.0.0.1:5001/answer", json=payload)
+                response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
+                return jsonify({"message": "Answer received successfully"})
+            except requests.RequestException as e:
+                return jsonify({"error": str(e)}), 500
         else:
-            return jsonify({ "error": "Invalid key" })
+            return jsonify({"error": "Invalid key"})
     else:
-        return jsonify({ "error": "Invalid data format" })
+        return jsonify({"error": "Invalid data format"})
 
 @app.route('/PID', methods=['POST'])
 def receive_pid():
@@ -112,7 +121,7 @@ def receive_pid():
 def get_transcripttion():
     key = request.args.get('key')
     if key in data["answer"]:
-        directory = r'C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio'
+        directory = Path(r"C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio")
         # หาไฟล์ทั้งหมดในไดเรกทอรี
         files = os.listdir(directory)
         # เรียงลำดับไฟล์ตามเวลาแก้ไขล่าสุด
@@ -121,7 +130,7 @@ def get_transcripttion():
         latest_file = files[0]
         print("ไฟล์ที่เพิ่มมาล่าสุด:", latest_file)
         # Load your own audio file
-        path = rf'C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio\{latest_file}'
+        path =rf"C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio\{latest_file}"
         # Load the audio and its sampling rate
         audio_array, sampling_rate = librosa.load(path, sr=16000, mono=True)
         # Transcribe the audio
@@ -129,14 +138,13 @@ def get_transcripttion():
         # Print the transcribed text
         Transcribed_text = result["text"]
         data["answer"][key] = Transcribed_text
+        payload = {'AnswerNo': key, 'Message': Transcribed_text}
+        # Send POST request to the other server
+        response = requests.post("http://127.0.0.1:5001/answer", json=payload)
+        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
         return jsonify(Transcribed_text)
     else:
         return jsonify({ "error": "Invalid key" })
-
-
-
-
-
     
 @app.route('/audioques', methods=['POST'])
 def post_audioques():
@@ -144,21 +152,28 @@ def post_audioques():
         # Get base64 audio data and key from JSON payload
         audio_base64 = request.json.get('audioBase64')
         key = request.json.get('key')
-        
+
         # Check if audio data and key exist
         if not audio_base64:
             return jsonify({ "error": "No audio data sent" }), 400
         if key not in data["question"]:
             return jsonify({ "error": "Invalid key" }), 400
-        
+
         # Update data with audio data for the specified key
         data["question"][key]['audio'] = audio_base64
-        
+
         # Return success message
         return jsonify({ "message": "Audio received and saved successfully" }), 200
     except Exception as e:
         return jsonify({ "error": str(e) }), 500
 
+@app.route('/senddata', methods=['POST'])
+def senddata():
+    data = request.getjson()  # Assume the data is in JSON format
+    # Send data to server2
+    url = 'http://127.0.0.1:5001/receive_data'
+    response = requests.post(url, json=data)
+    return jsonify(response.json())
 
 
 if __name__ == '__main__':

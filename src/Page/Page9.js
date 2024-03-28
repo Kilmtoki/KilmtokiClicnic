@@ -14,6 +14,7 @@ function Page9() {
     const audioChunks = useRef([]);
     const [texttranscription, setTextTranscription] = useState('');
     const [audioURL, setAudioURL] = useState(null);
+
     const startRecording = async () => {
         setIsRecording(true);
         const constraints = { audio: true, video: false };
@@ -31,11 +32,25 @@ function Page9() {
                 audioChunks.current.push(e.data);
             };
 
-            recorder.onstop = () => {
+            recorder.onstop = async () => {
                 const combinedBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
                 downloadWav(combinedBlob, false);
                 audioChunks.current = []; // Clear audioChunks after downloading
+            
+                // Set timeout for 5 seconds before executing the try block
+                setTimeout(async () => {
+                    try {
+                        const key = 'ans7';
+                        const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
+                        const data = response.data;
+                        console.log(data);
+                        setTextTranscription(data);
+                    } catch (error) {
+                        console.error('Error fetching audio:', error);
+                    }
+                }, 5000); // 5000 milliseconds = 5 seconds
             };
+            
 
             setMediaRecorder(recorder);
             recorder.start();
@@ -51,21 +66,9 @@ function Page9() {
             mediaRecorder.stop();
             mediaStream.current.getTracks().forEach(track => track.stop());
         }
-        try {
-            const key = 'ans7';
-            const response = await axios.get(`http://127.0.0.1:5000/transcription?key=${key}`);
-            const data = response.data;
-            console.log(data);
-            setTextTranscription(data);
-        } catch (error) {
-            console.error('Error fetching audio:', error);
-        }
     };
 
-    const playAudio = async () => {
-        if (!audioURL) {
-            await handleFetchAudio();
-        }
+    const playAudio = () => {
         if (audioURL) {
             const audio = new Audio(audioURL);
             audio.volume = 0.35; // กำหนดระดับเสียงเป็น 80%
@@ -96,6 +99,7 @@ function Page9() {
 
             // Set the audio URL to state
             setAudioURL(audioURL);
+            playAudio()
         } catch (error) {
             console.error('Error fetching audio:', error);
         }
@@ -107,7 +111,7 @@ function Page9() {
                     มีอาการรุนแรงหรือส่งผลต่อชีวิตประจำวันหรือไม่?
                     <span className="button-gap"></span>
                     <span className="button-gap"></span>
-                    <button onClick={playAudio}><AiFillSound  /></button>
+                    <button onClick={handleFetchAudio}><AiFillSound  /></button>
             </header>
             <div className="input-container">
                 <input

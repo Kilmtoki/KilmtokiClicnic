@@ -1,3 +1,12 @@
-text = "\u0e44\u0e21\u0e48\u0e17\u0e23\u0e32\u0e1a\u0e27\u0e48\u0e32\u0e40\u0e1b\u0e47\u0e19\u0e2d\u0e30\u0e44\u0e23\u0e21\u0e32 \u0e21\u0e35\u0e2d\u0e32\u0e01\u0e32\u0e23\u0e2d\u0e30\u0e44\u0e23\u0e1a\u0e49\u0e32\u0e07\u0e04\u0e30?"
-
-print("กิม")
+import os
+from pathlib import Path
+directory = Path(r"C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio")
+# หาไฟล์ทั้งหมดในไดเรกทอรี
+files = os.listdir(directory)
+# เรียงลำดับไฟล์ตามเวลาแก้ไขล่าสุด
+files.sort(key=lambda x: os.path.getmtime(os.path.join(directory, x)), reverse=True)
+# เลือกไฟล์ที่เพิ่มมาล่าสุด
+latest_file = files[0]
+print("ไฟล์ที่เพิ่มมาล่าสุด:", latest_file)
+path = Path(rf"C:\Users\USER\OneDrive\เดสก์ท็อป\SmartClinic\WEBAI-main\src\Model\Audio\ques\{latest_file}")
+print("Path: ",path)
